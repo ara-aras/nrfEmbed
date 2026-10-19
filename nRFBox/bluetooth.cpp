@@ -153,7 +153,7 @@ namespace BleJammer {
 namespace BleScan {
 
 BLEScan* scan;
-BLEScanResults results;
+BLEScanResults* results = nullptr;
 
 int selectedIndex = 0;
 int displayStartIndex = 0;
@@ -224,7 +224,7 @@ void blescanLoop() {
       }
       lastDebounce = currentMillis;
     } else if (digitalRead(BUTTON_DOWN_PIN) == LOW) {
-      if (selectedIndex < results.getCount() - 1) {
+      if (results && selectedIndex < results->getCount() - 1) {
         selectedIndex++;
         if (selectedIndex >= displayStartIndex + 5) {
           displayStartIndex++;
@@ -237,16 +237,16 @@ void blescanLoop() {
     }
   }
 
-  if (!showDetails && scanComplete) {
+  if (!showDetails && scanComplete && results) {
     u8g2.clearBuffer();
     u8g2.setFont(u8g2_font_5x8_tr);
     u8g2.drawStr(0, 10, "BLE Devices:");
 
-    int deviceCount = results.getCount();
+    int deviceCount = results->getCount();
     for (int i = 0; i < 5; i++) {
       int deviceIndex = i + displayStartIndex;
       if (deviceIndex >= deviceCount) break;
-      BLEAdvertisedDevice device = results.getDevice(deviceIndex);
+      BLEAdvertisedDevice device = results->getDevice(deviceIndex);
       String deviceName = device.getName().c_str();
       u8g2.setFont(u8g2_font_6x10_tr);
       if (deviceName.length() == 0) {
@@ -261,8 +261,8 @@ void blescanLoop() {
     u8g2.sendBuffer();
   }
 
-  if (showDetails) {
-    BLEAdvertisedDevice device = results.getDevice(selectedIndex);
+  if (showDetails && results) {
+    BLEAdvertisedDevice device = results->getDevice(selectedIndex);
     u8g2.clearBuffer();
     u8g2.setFont(u8g2_font_6x10_tr);
     u8g2.drawStr(0, 10, "Device Details:");
@@ -359,7 +359,7 @@ BLEAdvertisementData getOAdvertisementData() {
   packet[i++] =  0x10;  // Type ???
   esp_fill_random(&packet[i], 3);
 
-  advertisementData.addData(std::string((char *)packet, 17));
+  advertisementData.addData((char *)packet, 17);
   return advertisementData;
 }
 
@@ -391,7 +391,7 @@ void sourappleLoop() {
     BLEAdvertisementData oAdvertisementData = getOAdvertisementData();
 
     Advertising->setDeviceAddress(dummy_addr, BLE_ADDR_TYPE_RANDOM);
-    Advertising->addServiceUUID(device_uuid);
+    Advertising->addServiceUUID(device_uuid.c_str());
     Advertising->setAdvertisementData(oAdvertisementData);
 
     Advertising->setMinInterval(0x20);
@@ -492,7 +492,7 @@ namespace Spoofer {
     uint8_t advDataRaw[SAMSUNG_ADV_SIZE];
     memcpy(advDataRaw, SAMSUNG_ADV_TEMPLATE, SAMSUNG_ADV_SIZE);
     advDataRaw[SAMSUNG_ADV_SIZE - 1] = samsungModels[modelIndex].value;
-    advData.addData(std::string((char*)advDataRaw, SAMSUNG_ADV_SIZE));
+    advData.addData((char*)advDataRaw, SAMSUNG_ADV_SIZE);
     return true;
   }
 
@@ -500,14 +500,14 @@ namespace Spoofer {
     uint8_t advDataRaw[GOOGLE_ADV_SIZE];
     memcpy(advDataRaw, GOOGLE_ADV_TEMPLATE, GOOGLE_ADV_SIZE);
     advDataRaw[GOOGLE_ADV_SIZE - 1] = (uint8_t)(random(121) - 100); 
-    advData.addData(std::string((char*)advDataRaw, GOOGLE_ADV_SIZE));
+    advData.addData((char*)advDataRaw, GOOGLE_ADV_SIZE);
     return true;
   }
 
   BLEAdvertisementData getAdvertisementData() {
     BLEAdvertisementData oAdvertisementData = BLEAdvertisementData();
     if (deviceType <= 17) { // Apple (1–17)
-      oAdvertisementData.addData(std::string((char*)DEVICES[device_index], 31));
+      oAdvertisementData.addData((char*)DEVICES[device_index], 31);
     } else if (deviceType <= 20) { // Samsung (18–20)
       uint8_t samsungIndex = deviceType - 18; // 18→0, 19→1, 20→2
       generateSamsungAdvPacket(samsungIndex, oAdvertisementData);
@@ -621,7 +621,7 @@ namespace Spoofer {
       }
       BLEAdvertisementData oAdvertisementData = getAdvertisementData();
       pAdvertising->setDeviceAddress(dummy_addr, BLE_ADDR_TYPE_RANDOM);
-      pAdvertising->addServiceUUID(devices_uuid);
+      pAdvertising->addServiceUUID(devices_uuid.c_str());
       pAdvertising->setAdvertisementData(oAdvertisementData);
       pAdvertising->setMinInterval(0x20); // 32.5ms
       pAdvertising->setMaxInterval(0x20);

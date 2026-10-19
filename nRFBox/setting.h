@@ -28,8 +28,8 @@ extern Adafruit_NeoPixel pixels;
 
 //extern bool neoPixelActive;
 
-bool neoPixelActive = false;
-uint8_t oledBrightness = 100;
+extern bool neoPixelActive;
+extern uint8_t oledBrightness;
 
 extern RF24 RadioA;
 extern RF24 RadioB;

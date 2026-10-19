@@ -28,6 +28,19 @@
 #define NRF_CE_PIN_C    15  
 #define NRF_CSN_PIN_C   2  
 
+// IR-specific Pins
+#define IR_TX_PIN       13
+#define IR_RX_PIN       34  
+
+// Sub-GHz CC1101-specific Pins
+#define CC1101_CSN_PIN   12  // CC1101 Chip Select (SPI)
+#define CC1101_GDO2_PIN  35  // CC1101 GDO2 / RX Async Data Out (Input only GPIO35)
+#define CC1101_GDO0_PIN  0   // CC1101 GDO0 / TX Async Modulation In (GPIO0)
+
+// Multi-MCU / Auxiliary Board Bridge Pins (e.g. 2nd ESP32 or BW16)
+#define BRIDGE_UART_RX   16
+#define BRIDGE_UART_TX   17
+
 // Common dependencies
 #include "setting.h"
 #include <Arduino.h>
@@ -42,9 +55,7 @@
 #include <SD.h>
 #include <Update.h>
 
-U8G2_SSD1306_128X64_NONAME_F_HW_I2C u8g2(U8G2_R0, /* reset=*/ U8X8_PIN_NONE);
 
-Adafruit_NeoPixel pixels(1, 14, NEO_GRB + NEO_KHZ800);
 
 // BLE-specific dependencies
 #include <BLEDevice.h>
@@ -123,6 +134,19 @@ namespace WifiScan {
 namespace Deauther {
   void deautherSetup();
   void deautherLoop();
+}
+
+// IR-related namespace
+namespace IrControl {
+  void irSetup();
+  void irLoop();
+}
+
+// Sub-GHz related namespace
+namespace SubGhz {
+  void subghzSetup();
+  void subghzLoop();
+  void subghzStop();
 }
 
 #endif // CONFIG_H

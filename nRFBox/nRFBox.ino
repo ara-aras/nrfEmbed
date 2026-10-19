@@ -7,36 +7,39 @@
 #include "setting.h"
 #include "config.h"
 
+U8G2_SSD1306_128X64_NONAME_F_HW_I2C u8g2(U8G2_R0, /* reset=*/ U8X8_PIN_NONE);
+Adafruit_NeoPixel pixels(1, 14, NEO_GRB + NEO_KHZ800);
+
 extern uint8_t oledBrightness;
 
-const int NUM_ITEMS = 12;
+const int NUM_ITEMS = 14;
 const int MAX_ITEM_LENGTH = 20;
 
 const unsigned char* bitmap_icons[NUM_ITEMS] = {
   bitmap_icon_scanner, bitmap_icon_analyzer, bitmap_icon_jammer, bitmap_icon_kill,
   bitmap_icon_ble_jammer, bitmap_icon_spoofer, bitmap_icon_apple, bitmap_icon_ble,
-  bitmap_icon_wifi, bitmap_icon_wifi_jammer, bitmap_icon_about, 
-  bitmap_icon_setting
+  bitmap_icon_wifi, bitmap_icon_wifi_jammer, bitmap_icon_ir, bitmap_icon_subghz,
+  bitmap_icon_about, bitmap_icon_setting
 };
 
 char menu_items[NUM_ITEMS][MAX_ITEM_LENGTH] = {  
   "Scanner", "Analyzer", "WLAN Jammer", "Proto Kill", "BLE Jammer",
   "BLE Spoofer", "Sour Apple", "BLE Scan", "WiFi Scan", 
-  "Deauther", "About", "Setting"
+  "Deauther", "IR Control", "Sub-GHz", "About", "Setting"
 };
 
 void (*menu_functions[NUM_ITEMS])() = {
   Scanner::scannerSetup, Analyzer::analyzerSetup, Jammer::jammerSetup,
   ProtoKill::blackoutSetup, BleJammer::blejammerSetup, Spoofer::spooferSetup,
   SourApple::sourappleSetup, BleScan::blescanSetup, WifiScan::wifiscanSetup, Deauther::deautherSetup,
-  utils, Setting::settingSetup
+  IrControl::irSetup, SubGhz::subghzSetup, utils, Setting::settingSetup
 };
 
 void (*menu_loop_functions[NUM_ITEMS])() = {
   Scanner::scannerLoop, Analyzer::analyzerLoop, Jammer::jammerLoop,
   ProtoKill::blackoutLoop, BleJammer::blejammerLoop, Spoofer::spooferLoop,
   SourApple::sourappleLoop, BleScan::blescanLoop, WifiScan::wifiscanLoop, Deauther::deautherLoop,
-  nullptr, Setting::settingLoop
+  IrControl::irLoop, SubGhz::subghzLoop, nullptr, Setting::settingLoop
 };
 
 int item_selected = 0;
@@ -69,20 +72,19 @@ void drawMenu() {
   const int icons_per_row = 3;
   const int icons_per_col = 2;
   const int max_display_items = icons_per_row * icons_per_col; 
+  const int total_rows = (NUM_ITEMS + icons_per_row - 1) / icons_per_row;
 
+  int item_row = item_selected / icons_per_row;
   int selected_col = item_selected % icons_per_row;
-  int selected_row = (item_selected / icons_per_row) % icons_per_col;
-  if (item_selected == 12) {
-    selected_row = 1; 
-  }
+
+  int start_row = item_row - (item_row % icons_per_col);
+  if (start_row > total_rows - icons_per_col) start_row = total_rows - icons_per_col;
+  if (start_row < 0) start_row = 0;
+
+  int selected_row = item_row - start_row;
   int highlight_x = 13 + selected_col * 40;
   int highlight_y = 14 + selected_row * 24;
 
-  int start_row = (item_selected / icons_per_row) - selected_row;
-  if (start_row < 0) start_row = 0;
-  int total_rows = (NUM_ITEMS + icons_per_row - 1) / icons_per_row;
-  if (start_row > total_rows - icons_per_col) start_row = total_rows - icons_per_col;
-  if (start_row < 0) start_row = 0; 
   int start_item = start_row * icons_per_row;
   int end_item = min(NUM_ITEMS, start_item + max_display_items);
 

@@ -1,0 +1,10 @@
+# Node tooling (docx build helper)
+node_modules/
+
+# Arduino build output
+nRFBox/build/
+*.bin.tmp
+
+# OS cruft
+Thumbs.db
+.DS_Store

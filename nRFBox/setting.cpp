@@ -6,10 +6,14 @@
 #include "setting.h"
 #include "icon.h"
 #include "config.h"
+#include "subghz.h"
 
 RF24 RadioA(NRF_CE_PIN_A, NRF_CSN_PIN_A);
 RF24 RadioB(NRF_CE_PIN_B, NRF_CSN_PIN_B);
 RF24 RadioC(NRF_CE_PIN_C, NRF_CSN_PIN_C);
+
+bool neoPixelActive = false;
+uint8_t oledBrightness = 100;
 
 void setRadiosNeutralState() {
   RadioA.stopListening();
@@ -29,6 +33,8 @@ void setRadiosNeutralState() {
   RadioC.setRetries(0, 0);
   RadioC.powerDown(); 
   digitalWrite(NRF_CE_PIN_C, LOW); 
+
+  SubGhz::subghzStop();
 }
 
 void configureNrf(RF24 &radio) {

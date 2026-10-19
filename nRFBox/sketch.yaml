@@ -1,0 +1,5 @@
+# Build profile for nRFBox.
+# The firmware exceeds the default 1.3MB app partition, so it needs the
+# "No OTA (2MB APP/2MB SPIFFS)" scheme. Arduino IDE: Tools > Partition Scheme.
+# arduino-cli picks this up automatically via the default_fqbn below.
+default_fqbn: esp32:esp32:esp32:PartitionScheme=no_ota

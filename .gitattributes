@@ -1,0 +1,24 @@
+# Normalize all text to LF in the repo. Prevents CRLF/LF churn across
+# Windows/macOS/Linux checkouts. Arduino IDE and arduino-cli read LF fine.
+* text=auto eol=lf
+
+# Source and docs -> always LF
+*.ino   text eol=lf
+*.cpp   text eol=lf
+*.h     text eol=lf
+*.c     text eol=lf
+*.md    text eol=lf
+*.txt   text eol=lf
+*.json  text eol=lf
+*.yaml  text eol=lf
+*.yml   text eol=lf
+*.csv   text eol=lf
+
+# Binaries -> never touched
+*.png   binary
+*.jpg   binary
+*.jpeg  binary
+*.bin   binary
+*.ico   binary
+*.docx  binary
+*.pdf   binary
