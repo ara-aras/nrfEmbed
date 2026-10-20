@@ -25,6 +25,14 @@
 
 </div>
 
+> [!NOTE]
+> **This is a derivative of [nRFBox](https://github.com/cifertech/nRFBox) by [CiferTech](https://cifertech.net/).**
+> CiferTech designed the original hardware and firmware and released it under the MIT License.
+> This fork is maintained by [ara-aras](https://github.com/ara-aras) and focuses on a long-range IR remote
+> (learn, name and save buttons per device on SD, send power and control codes).
+> See [docs/hardware/IR-ADDON.md](docs/hardware/IR-ADDON.md) for the IR add-on schematic and BOM.
+> The original copyright and MIT license are kept in [LICENCE](LICENCE). Please support the original author.
+
 ## 📖 Explore the nRFBox Wiki
 
 Complete project story, in-depth tutorials, and all the features in [Wiki](https://github.com/cifertech/nRFBox/wiki)! From Wi-Fi deauthentication attacks to Sub-GHz signal replay, the Wiki covers everything you need to get started. [Click here to explore now!](https://github.com/cifertech/nRFBox/wiki)
